@@ -2,7 +2,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
-
+//struct stat file
+#include <sys/stat.h>
 #include <errno.h>
 #include <stdlib.h>
 
@@ -69,7 +70,7 @@ int action_pwd(){
 int action_cd(char** word_line){
 
     getcwd(prevdir, 100);
-    printf(prevdir);
+    //printf(prevdir);
     if (eqcmd(word_line[1], "..")){
         chdir("..");
         return EXIT_SUCCESS;
@@ -88,7 +89,7 @@ int action_cd(char** word_line){
 }
 
 
-int action_ls(){
+int action_ls(char** word_line){
     //recuperation de notre repertoire courant
     char repcourant[400];
     getcwd(repcourant,400);
@@ -99,9 +100,23 @@ int action_ls(){
     //Readdir retourne un pointeur 
     while ((lecture = readdir(rep)) != NULL)
     {
-        //Affichage du dossier pointe
-        printf("%s\n", lecture->d_name);
+        //Test si l'on veut afficher des infos sur les fichiers
+        //On test si il exite un attribut à la commande et si c'est le bon 
+        if (word_line[1] != NULL){
+            if (eqcmd(word_line[1], "-info")){
+                //On recupere les infos du fichier grace a stat()
+                struct stat filest;
+                stat(lecture->d_name, &filest);
+                //Affichage des infos
+                printf((filest.st_mode & S_IROTH) ? "r" : "-"); //protec U G O
+                printf("    %d", filest.st_mode); //Taille du fichier
+                printf("    %ld     ", filest.st_blocks); //Nb de block
+            }
+        }
+        printf("%s\n", lecture->d_name); //Nom du fichier      
+        
     }
+    printf("\n");
     //ferme le flux d'annuaire 
     closedir(rep);
     return EXIT_SUCCESS;
@@ -162,12 +177,12 @@ int main(){
             } else if (eqcmd(word_line[0], "cd")){
                 if(taille >= 2){
                     //Test si il y a bien deux arguments
-                    //Puis test si il y a bien cd en argument
+                    //Et test si il y a bien cd en argument
                     action_cd(word_line);
                 }
             } else if (eqcmd(word_line[0], "ls")){
                 //Affiche les fichiers dans le dossier courant
-                action_ls();
+                action_ls(word_line);
             }
             /*
             else {
