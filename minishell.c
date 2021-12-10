@@ -69,13 +69,24 @@ int action_pwd(){
 
 int action_cd(char** word_line){
 
-    getcwd(prevdir, 100);
     //printf(prevdir);
     if (eqcmd(word_line[1], "..")){
+        getcwd(prevdir, 100);
         chdir("..");
         return EXIT_SUCCESS;
     }
+
+    else if (eqcmd(word_line[1], "-")){
+        char tmp[100];
+        getcwd(tmp, 100);
+        //printf("(%s)",prevdir);
+
+        chdir(prevdir);
+        return EXIT_SUCCESS;
+    }
+
     else {
+        getcwd(prevdir, 100);
         // on se rend dans le repertoire choisi
         if (chdir(word_line[1])){
             // si il n'existe pas
