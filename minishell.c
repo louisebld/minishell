@@ -189,6 +189,46 @@ int action_exec_red(char** word_line){
 }
 
 
+int action_pipe(char** word_line){
+    int pid;
+    // Tab qui contient le fd des deux fichiers
+    int fd[2];
+
+    int in = 0;
+    //retourne 2 fd, fd[0] refere a la lecture, fd[1] a l'ecriture 
+    pipe(fd);
+
+    if ((pid = fork ()) == 0)
+    {
+        if (in != 0)
+        {
+            dup2 (in, 0);
+            close (in);
+        }
+
+        if (fd[1] != 1)
+        {
+            dup2 (fd[1], 1);
+            close (fd[1]);
+        }
+    
+        //char *args[] = { word_line[1], 0 };
+
+        return execlp (word_line[0], word_line[0], NULL);
+    }
+    //
+    close (fd [1]);
+    in = fd[0];
+
+    if (in != 0){
+        dup2 (in, 0);
+    }
+    //char *args2[] = { word_line[4], 0 };
+    /* Execute le dernier appel */
+    return execlp (word_line[2], word_line[2], NULL);
+}
+
+
 
 int main(){
 
@@ -249,10 +289,14 @@ int main(){
                 }
             } else if (eqcmd(word_line[0], "ls")){
                 //Affiche les fichiers dans le dossier courant
-                action_ls(word_line);
-            }
+                action_pipe(word_line);
+            } 
+            // else if (eqcmd(word_line[2], "|")){
 
-             else if (eqcmd(word_line[0], "exec")){
+            //     //action_ls(word_line);
+
+            // } 
+            else if (eqcmd(word_line[0], "exec")){
 
                  if (taille>=2){
 
