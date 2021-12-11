@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 // pour sau
 char prevdir[100] = "";
@@ -134,6 +135,59 @@ int action_ls(char** word_line){
 
 }
 
+int action_exec(char** word_line){
+
+    int pid = fork();
+    char* filename = word_line[1];
+    char *args[] = { filename, NULL };
+
+
+    if (pid==0){
+        //execv(filename, word_line);
+        execv(filename, args);
+        exit(EXIT_SUCCESS);
+    }
+
+
+//1. pid du processus fils p our le p ère
+//2. 0 pour le fls
+    return EXIT_SUCCESS;
+}
+
+int action_exec_red(char** word_line){
+
+    char* filenameredirection = word_line[3];
+    // on ouvre le fichier en lecture et en écriture
+    int newdescriptor =  open(filenameredirection, O_RDWR);
+    //printf("des1%d", newdescriptor);
+    if (newdescriptor==-1){
+        // on crée le fichier en écriture
+        fopen(filenameredirection, "w");
+        // on re récupère le filedescriptor du fichier
+        newdescriptor =  open(filenameredirection, O_RDWR);
+    }
+    //printf("des2%d", newdescriptor);
+
+    // on change la sortie standard par notre fichier
+    dup2(newdescriptor, STDOUT_FILENO);
+
+    int pid = fork();
+    char* filename = word_line[1];
+    char *args[] = { filename, NULL };
+
+    if (pid==0){
+        execv(filename, args);
+        exit(EXIT_SUCCESS);
+    }
+
+    // on remet la sortie standard
+    // marche pas ça sort dans le fichier ..
+    // le execv bloque tout
+    // printf("passage");
+    dup(1);
+    return EXIT_SUCCESS;
+}
+
 
 
 int main(){
@@ -169,9 +223,11 @@ int main(){
 
 
         //Affichage de l'input découpé
-        for (int j = 0; j < taille-1; j++){
-            printf("%s\n", word_line[j]);
-        }
+
+        // for (int j = 0; j < taille-1; j++){
+        //     printf("%d : %s\n",j, word_line[j]);
+        // }
+
         //printf("%d", taille);
         //Si la cmd rentrée n'est pas vide
 
@@ -194,6 +250,30 @@ int main(){
             } else if (eqcmd(word_line[0], "ls")){
                 //Affiche les fichiers dans le dossier courant
                 action_ls(word_line);
+            }
+
+             else if (eqcmd(word_line[0], "exec")){
+
+                 if (taille>=2){
+
+                     if (taille==3){
+                        action_exec(word_line);
+
+                     }
+                        //action_exec(word_line);
+                     // Redirection
+                     else if (eqcmd(word_line[2], ">")){
+                        action_exec_red(word_line);
+
+                     }
+                     else {
+                         printf("Mauvais arguments");
+                     }
+
+                 }
+                 else {
+                     printf("%s", "Pas de nom de fichier");
+                 }
             }
             /*
             else {
