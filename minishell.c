@@ -154,6 +154,7 @@ int action_exec(char** word_line){
     else {
         // père
         int status;
+        // le père attend lexecution du fils
         waitpid(pid, &status, 0);
     }
 
@@ -242,14 +243,17 @@ int action_pipe(char** word_line){
 
 
 
-
-
 int is_pipe_in(char **word_line, int taille){
     int res = 0;
     for (int i = 0; i < taille-1; i++){
         if (eqcmd(word_line[i], "|")) res = 1;
     }
     return res;
+}
+
+void action_ERREUR(){
+    printf("Mauvaise commande : %s\n", strerror(errno));
+
 }
 
 int main(){
@@ -340,11 +344,11 @@ int main(){
                      printf("%s", "Pas de nom de fichier");
                  }
             }
-            /*
+            
             else {
                 //Affiche les erreurs ???
                 action_ERREUR();
-            } */
+            } 
         }    
 
     }

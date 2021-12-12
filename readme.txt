@@ -19,13 +19,10 @@ Cela signifie que notre dernière commande a été exécutée correctement.
 3.1
 Nous avons utilisé getcwd(..) pour récupérer le repertoire courant
 
-
 3.3
 
 Le répertoire de travail actuel d'un processus est stocké par le noyau.
 L'autre repertoire associé au processus est le / (root)
-
-
 
 6.
 
@@ -38,6 +35,9 @@ Les éléments communs au père et au fils sont : le groupe de processus (pgrp),
 Le usr est commun également.
 
 Le PID du fils ne change pas après un appel un exec(). Cet appel écrase le processus fils qui contient alors le code cloné du père par un nouveau programme.
+
+La fonctionnalité exec marche : exec hellojohn
+mais le exec hellojohn > test.txt marche à moitié. Nous ne sommes pas arriver à rechanger la sortie standard du coup toutes les commandes tapées après sont écrites dans le fichier.
 
 
 6.1
