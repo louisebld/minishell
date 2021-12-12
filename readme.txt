@@ -37,7 +37,9 @@ Le usr est commun également.
 Le PID du fils ne change pas après un appel un exec(). Cet appel écrase le processus fils qui contient alors le code cloné du père par un nouveau programme.
 
 La fonctionnalité exec marche : exec hellojohn
-mais le exec hellojohn > test.txt marche à moitié. Nous ne sommes pas arriver à rechanger la sortie standard du coup toutes les commandes tapées après sont écrites dans le fichier.
+
+6.2
+Mais le exec hellojohn > test.txt marche à moitié. Nous ne sommes pas arriver à rechanger la sortie standard du coup toutes les commandes tapées après sont écrites dans le fichier.
 
 
 6.1
@@ -46,3 +48,8 @@ dup2(fd,STDOUT_FILENO) permet de rediriger la sortie standard sur le fichier qu'
 dup2 vient donc créer une nouvelle entrée dans la table de File Descriptor.
 La sortie STDOUT est donc relié non plus à 0 mais au nouveau file descriptor, donc a notre fichier.
 
+6.3
+
+La fonction is_in_pipe teste si il y a un pipe dans la ligne de commande.
+Dans la fonction action_pipe, nous prenons un tableau avec les deux descripteurs de fichiers.
+Il faut en ouvrir un en lecture et l'autre exécuté en écriture et le résultat du premier devient l'entrée de l'autre.
