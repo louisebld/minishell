@@ -23,7 +23,7 @@ Nous avons utilisé getcwd(..) pour récupérer le repertoire courant
 3.3
 
 Le répertoire de travail actuel d'un processus est stocké par le noyau.
-
+L'autre repertoire associé au processus est le / (root)
 
 
 
@@ -32,3 +32,19 @@ Le répertoire de travail actuel d'un processus est stocké par le noyau.
 L'appel système fork() permet à un processus de créer un processus similaire au processus courant (père)
 Elle retourne 0 au processus fils et en cas de succès le père reçoit le pid du processus crée.
 Le père reçoit -1 en cas d'échec
+Si la réponse du fork() est 0 alors on peut lancer la commande d'éxécution immédiatement mais ce n'est pas automatique.
+
+Les éléments communs au père et au fils sont : le groupe de processus (pgrp), la session et le leader du groupe de processus.
+Le usr est commun également.
+
+Le PID du fils ne change pas après un appel un exec(). Cet appel écrase le processus fils qui contient alors le code cloné du père par un nouveau programme.
+
+Dans notre fonction exec() il n'est pour l'instant pas possible de revenir dans le minishell après avoir fait exec.
+
+
+6.1
+
+dup2(fd,STDOUT_FILENO) permet de rediriger la sortie standard sur le fichier qu'on veut en lui donnant le file descriptor.
+dup2 vient donc créer une nouvelle entrée dans la table de File Descriptor.
+La sortie STDOUT est donc relié non plus à 0 mais au nouveau file descriptor.
+
