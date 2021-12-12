@@ -44,5 +44,5 @@ Le PID du fils ne change pas après un appel un exec(). Cet appel écrase le pro
 
 dup2(fd,STDOUT_FILENO) permet de rediriger la sortie standard sur le fichier qu'on veut en lui donnant le file descriptor.
 dup2 vient donc créer une nouvelle entrée dans la table de File Descriptor.
-La sortie STDOUT est donc relié non plus à 0 mais au nouveau file descriptor.
+La sortie STDOUT est donc relié non plus à 0 mais au nouveau file descriptor, donc a notre fichier.
 

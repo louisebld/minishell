@@ -208,6 +208,7 @@ int action_exec_red(char** word_line){
 }
 
 
+// pb arguements
 int action_pipe(char** word_line){
     int pid;
     // Tab qui contient le fd des deux fichiers
@@ -219,12 +220,6 @@ int action_pipe(char** word_line){
 
     if ((pid = fork ()) == 0)
     {
-        if (in != 0)
-        {
-            dup2 (in, 0);
-            close (in);
-        }
-
         if (fd[1] != 1)
         {
             dup2 (fd[1], 1);
@@ -235,19 +230,27 @@ int action_pipe(char** word_line){
 
         return execlp (word_line[0], word_line[0], NULL);
     }
-    //
     close (fd [1]);
     in = fd[0];
 
     if (in != 0){
         dup2 (in, 0);
     }
-    //char *args2[] = { word_line[4], 0 };
     /* Execute le dernier appel */
     return execlp (word_line[2], word_line[2], NULL);
 }
 
 
+
+
+
+int is_pipe_in(char **word_line, int taille){
+    int res = 0;
+    for (int i = 0; i < taille-1; i++){
+        if (eqcmd(word_line[i], "|")) res = 1;
+    }
+    return res;
+}
 
 int main(){
 
@@ -292,6 +295,11 @@ int main(){
 
         //printf("(%s)", word_line[0]);
         if (taille > 0){
+            
+            if(is_pipe_in(word_line, taille)){
+                action_pipe(word_line);
+            }
+
 
             if(eqcmd(word_line[0], "exit")){
                 //quitte le shell
@@ -308,14 +316,8 @@ int main(){
                 }
             } else if (eqcmd(word_line[0], "ls")){
                 //Affiche les fichiers dans le dossier courant
-                action_pipe(word_line);
-            } 
-            // else if (eqcmd(word_line[2], "|")){
-
-            //     //action_ls(word_line);
-
-            // } 
-            else if (eqcmd(word_line[0], "exec")){
+                action_ls(word_line);
+            }   else if (eqcmd(word_line[0], "exec")){
 
                  if (taille>=2){
 
