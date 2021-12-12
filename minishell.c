@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 // pour sau
 char prevdir[100] = "";
@@ -136,16 +138,23 @@ int action_ls(char** word_line){
 }
 
 int action_exec(char** word_line){
-
+    //int pidparent = getpid();
     int pid = fork();
     char* filename = word_line[1];
     char *args[] = { filename, NULL };
-
 
     if (pid==0){
         //execv(filename, word_line);
         execv(filename, args);
         exit(EXIT_SUCCESS);
+    }
+    else  if (pid==-1){
+        //erreur
+    }
+    else {
+        // père
+        int status;
+        waitpid(pid, &status, 0);
     }
 
 
@@ -176,15 +185,25 @@ int action_exec_red(char** word_line){
     char *args[] = { filename, NULL };
 
     if (pid==0){
+        //execv(filename, word_line);
         execv(filename, args);
         exit(EXIT_SUCCESS);
+    }
+    else  if (pid==-1){
+        //erreur
+        printf("Error message : %s\n", strerror(errno));
+    }
+    else {
+        // père
+        int status;
+        waitpid(pid, &status, 0);
+        close(pid);
     }
 
     // on remet la sortie standard
     // marche pas ça sort dans le fichier ..
     // le execv bloque tout
-    // printf("passage");
-    dup(1);
+    dup2(STDOUT_FILENO, newdescriptor);
     return EXIT_SUCCESS;
 }
 

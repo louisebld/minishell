@@ -39,8 +39,6 @@ Le usr est commun également.
 
 Le PID du fils ne change pas après un appel un exec(). Cet appel écrase le processus fils qui contient alors le code cloné du père par un nouveau programme.
 
-Dans notre fonction exec() il n'est pour l'instant pas possible de revenir dans le minishell après avoir fait exec.
-
 
 6.1
 
